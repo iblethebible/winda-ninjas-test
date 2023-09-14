@@ -228,7 +228,9 @@ ob_end_flush();
             <div class="col">
                     <h3><a href="jobhistory.php?id=<?php echo $job_id ?>"><i class="bi bi-calendar3" style="font-size: 3em; color: black;"></i></a></h3>
                 </div>
-        
+            <div class="col">
+                <h3><a href="jobmap.php?id=<?php echo $job_id ?>"><i class="bi bi-geo-alt-fill" style="font-size: 3em; color: black;"></i></a></h3>
+            </div>
             <div class="col">
                 <h3><a href="/views/customer/customer.php?id=<?php echo $job_id ?>"><i class="bi bi-person-fill" style="font-size: 3em; color: black;"></i></a></h3>
             </div>
