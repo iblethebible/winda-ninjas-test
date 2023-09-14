@@ -1,0 +1,7 @@
+/authenticate
+/composer.json
+/composer.lock
+/default-ssl.conf
+/Dockerfile
+/includes
+/startup-script.sh

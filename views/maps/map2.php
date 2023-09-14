@@ -1,0 +1,203 @@
+<?php
+ob_start();
+session_start();
+if (!isset($_SESSION['loggedin'])) {
+    header('location: /index.html');
+    exit;
+}
+
+include "../../includes/connectdb.php";
+date_default_timezone_set('GMT');
+$org_id = $_SESSION['org_id'];
+
+$zones_sql = "SELECT * FROM zone_org" . $org_id;
+$zones_result = $conn->query($zones_sql);
+$zones = array();
+
+if ($zones_result->num_rows > 0) {
+    while ($row = $zones_result->fetch_assoc()) {
+        array_push($zones, array('id' => $row['id'], 'name' => $row['area']));
+    }
+} else {
+    echo "0 zones found";
+}
+
+$selected_zone_id = $_POST['zone_id'] ?? null;
+
+if ($selected_zone_id) {
+    $sql = "SELECT id, latitude, longitude FROM job_org" . $org_id . " WHERE zone_id = " . $selected_zone_id . " AND dateNextDue <= CURDATE() AND latitude IS NOT NULL AND longitude IS NOT NULL";
+} else {
+    $sql = "SELECT id, latitude, longitude FROM job_org" . $org_id . " WHERE dateNextDue <= CURDATE() AND latitude IS NOT NULL AND longitude IS NOT NULL";
+}
+
+$result = $conn->query($sql);
+
+$coordinates = array();
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        array_push($coordinates, array('id' => $row['id'], 'lat' => $row['latitude'], 'lng' => $row['longitude']));
+    }
+} else {
+    echo "0 results";
+}
+
+
+
+ob_end_flush();
+?>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Waypoints Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        #mapid {
+            width: 100%;
+            height: 70vh;
+        }
+        .card-custom {
+            background-color: #f8f9fa;
+            border-color: #343a40;
+            border: 2px solid #007bff;
+           }
+           .topnav {
+            overflow: hidden;
+            background-color: #333;
+            position: relative;
+        }
+
+        /* Hide the links inside the navigation menu (except for logo/home) */
+        .topnav #myLinks {
+            display: none;
+        }
+
+        /* Style navigation menu links */
+        .topnav a {
+            color: white;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+            display: block;
+        }
+
+        /* Style the hamburger menu */
+        .topnav a.icon {
+            background: black;
+            display: block;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        /* Add a grey background color on mouse-over */
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        /* Style the active link (or home/logo) */
+        .active {
+            /* background-color: #04AA6D; */
+            color: white;
+        }
+
+    </style>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="/js/removeCompleteButtons.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> <!-- For hamburger menu -->
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <script src="jquery-3.6.0.min.js"></script>
+    <link href="/css/main.css" rel="stylesheet">
+</head>
+        <div class="container mt-5">
+        <div class="topnav">
+        <a href="/views/dashboard.php" class="active">Winda Ninjas</a>
+        <!-- Navigation links (hidden by default) -->
+        <div id="myLinks">
+            <a href="/views/jobs/jobs.php">All Jobs</a>
+            <a href="/views/jobs/jobadd.php">Add Job</a>
+            <a href="/views/manager/addzone.php">Add Zone</a>
+            <a href="/views/manager/charts.php">Metrics</a>
+            <a href="/views/manager/changepassword.php">Change Password</a>
+            </a>
+            </a>
+            <a href="/views/manager/logout.php">Logout</a>
+        </div>
+        <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
+        <div class="card card-custom">
+            <div class="card-body">
+    <div id="mapid"></div>
+    </div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('mapid').setView([52.697446, -2.7310085], 14);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 45,
+        }).addTo(map);
+
+        if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        var lat = position.coords.latitude;
+        var lon = position.coords.longitude;
+        map.setView([lat, lon], 14);
+
+        // Create a custom icon
+        var youAreHereIcon = L.icon({
+            iconUrl: '/imgs/logo.png', // Path to your image
+            iconSize: [30, 50], // Size of the icon. Adjust as needed.
+            iconAnchor: [22, 94], // Point of the icon which will correspond to marker's location.
+            popupAnchor: [-3, -76] // Point from which the popup should open relative to the iconAnchor.
+        });
+
+        // Create a new marker using the custom icon
+        var youAreHereMarker = L.marker([lat, lon], {icon: youAreHereIcon}).addTo(map);
+        youAreHereMarker.bindPopup("<b>You are here</b>").openPopup();
+    });
+}
+
+        var waypoints = <?php echo json_encode($coordinates); ?>;
+        console.log(waypoints);
+
+        function onMarkerClick(id) {
+            return function() {
+                window.location.href = "../jobs/jobupdate.php?id=" + id;
+            }
+        }
+
+        for (var i = 0; i < waypoints.length; i++) {
+            var marker = L.marker([waypoints[i].lat, waypoints[i].lng]).addTo(map);
+            console.log('Created marker:', marker);
+            marker.on('click', onMarkerClick(waypoints[i].id));
+        }
+    </script>
+    </div>
+    </div>
+<script>
+        document.getElementById('zone').addEventListener('change', function() {
+            document.getElementById('zone-form').submit();
+        });
+    </script>
+    <script> 
+        function myFunction() {
+            var x = document.getElementById("myLinks");
+            if (x.style.display === "block") {
+            x.style.display = "none";
+            } else {
+            x.style.display = "block";
+            }
+        }      
+    </script>
+</body>
+
+</html>
