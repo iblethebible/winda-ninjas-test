@@ -41,8 +41,12 @@ $longitude = $rowJobData["longitude"];
 
 // Convert the date strings to English format
 $dateNextDue = date("d/m/Y", strtotime($dateNextDue));
-$dateLastDone = date("d/m/Y", strtotime($dateLastDone));
-
+// Check if the date is not null before converting
+if ($dateLastDone !== null) {
+    $dateLastDone = date("d/m/Y", strtotime($dateLastDone));
+} else {
+    $dateLastDone = "Not cleaned yet";
+}
 // Get zone name
 $stmtZoneName = $conn->prepare("SELECT area FROM zone_org" . $org_id . " INNER JOIN job_org" . $org_id . " ON zone_org" . $org_id . ".id = job_org" . $org_id . ".zone_id WHERE job_org" . $org_id . ".id = ?");
 $stmtZoneName->bind_param("i", $job_id);
@@ -258,13 +262,11 @@ ob_end_flush();
                                 <th>Clean on:</th>
                                 <td><?php echo $dateNextDue ?></td>
                             </tr>
-                            <tr>
-                                <th>Last cleaned:</th>
-                                <td><?php if ($dateLastDone !== null) {
-                                        $dateLastDone = date("d/m/Y", strtotime($dateLastDone));
-                                    } else {
-                                        $dateLastDone = "Not cleaned yet";
-                                    } ?></td>
+
+                            <th>Last cleaned:</th>
+                            <td><?php echo $dateLastDone?></td>
+                            </tr>
+
                             <tr>
                                 <th>Zone:</th>
                                 <td><?php echo $areanameprod ?></td>
