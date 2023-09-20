@@ -32,7 +32,6 @@ if (isset($_GET["job_add_submit"])) {
     $var_payment = $_GET["paymentType_form"];
     $var_info = $_GET["info_form"];
     $var_postcode = $_GET["postcode_form"];
-    $dateLastDone = date("Y-m-d H:i:s"); // get the current date/time
     $dateNextDue = date("Y-m-d H:i:s"); // get the current date/time
 
     $selected_zone_id = $var_zone;
@@ -58,13 +57,13 @@ if (isset($_GET["job_add_submit"])) {
         $latitude = $geocodeData['latitude'];
         $longitude = $geocodeData['longitude'];
 
-        $stmtAddJob = $conn->prepare("INSERT INTO job_org" . $org_id . " (houseNumName, streetName, postcode, price, frequency, zone_id, paymentType_id, info, longitude, latitude, dateLastDone, dateNextDue) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmtAddJob = $conn->prepare("INSERT INTO job_org" . $org_id . " (houseNumName, streetName, postcode, price, frequency, zone_id, paymentType_id, info, longitude, latitude,  dateNextDue) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         if (!$stmtAddJob) {
             die("Prepare failed: (" . $conn->error . ") " . $conn->error);
         }
 
-        $stmtAddJob->bind_param("ssssisssddss", $var_house_num, $var_street, $var_postcode, $var_price, $var_frequency, $var_zone, $var_payment, $var_info, $longitude, $latitude, $dateLastDone, $dateNextDue);
+        $stmtAddJob->bind_param("ssssisssdss", $var_house_num, $var_street, $var_postcode, $var_price, $var_frequency, $var_zone, $var_payment, $var_info, $longitude, $latitude, $dateNextDue);
 
         if ($stmtAddJob->execute()) {
             echo '<div class="alert alert-success">

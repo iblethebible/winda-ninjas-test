@@ -153,12 +153,15 @@ ob_end_flush();
     <link href="/css/main.css" rel="stylesheet">
     <style>
         .card-custom {
-            background-color: #f8f9fa; 
+            background-color: #f8f9fa;
             border-color: #343a40;
         }
-        .card-custom h1, h2 {
+
+        .card-custom h1,
+        h2 {
             color: #343a40;
         }
+
         .topnav {
             overflow: hidden;
             background-color: #333;
@@ -204,8 +207,8 @@ ob_end_flush();
 </head>
 
 <body>
-<!-- Top Navigation Menu -->
-<div class="topnav" style="margin-bottom: 10px;">
+    <!-- Top Navigation Menu -->
+    <div class="topnav" style="margin-bottom: 10px;">
         <a href="/views/dashboard.php" class="active">Winda Ninjas</a>
         <!-- Navigation links (hidden by default) -->
         <div id="myLinks">
@@ -224,35 +227,32 @@ ob_end_flush();
         </a>
     </div>
     <div class="row">
-            <div class="col">
-                    <h3><a href="jobhistory.php?id=<?php echo $job_id ?>"><i class="bi bi-calendar3" style="font-size: 3em; color: blue;"></i></a></h3>
-                </div>
-            <div class="col">
-                <h3><a href="/views/maps/jobroute.php?id=<?php echo $job_id ?>"><i class="bi bi-geo-alt-fill" style="font-size: 3em; color: blue;"></i></a></h3>
-            </div>
-            <div class="col">
-                <h3><a href="/views/customer/customer.php?id=<?php echo $job_id ?>"><i class="bi bi-person-fill" style="font-size: 3em; color: blue;"></i></a></h3>
-            </div>
+        <div class="col">
+            <h3><a href="jobhistory.php?id=<?php echo $job_id ?>"><i class="bi bi-calendar3" style="font-size: 3em; color: blue;"></i></a></h3>
         </div>
-        <div class="container">
-            
-            <div class="row">
+        <div class="col">
+            <h3><a href="/views/maps/jobroute.php?id=<?php echo $job_id ?>"><i class="bi bi-geo-alt-fill" style="font-size: 3em; color: blue;"></i></a></h3>
+        </div>
+        <div class="col">
+            <h3><a href="/views/customer/customer.php?id=<?php echo $job_id ?>"><i class="bi bi-person-fill" style="font-size: 3em; color: blue;"></i></a></h3>
+        </div>
+    </div>
+    <div class="container">
 
-                <div class="col-sm">
-                    <?php
-                    $jobcompleteunpaid = '<form action="jobupdate.php" method="get"><input type="hidden" name="id" value="' . $job_id . '"><input id="unpaid-button" class="btn btn-warning" type="submit" name="submit_button" value="JOB COMPLETE/UNPAID">';
-                    echo $jobcompleteunpaid;
-                    ?>
-                    </form>
-                </div>
+        <div class="row">
 
-                <div class="col-sm">
-                    <div class="card-custom">
-                        <div class="card-body" style="border: black">
-                  
+            <div class="col-sm">
+                <?php
+                $jobcompleteunpaid = '<form action="jobupdate.php" method="get"><input type="hidden" name="id" value="' . $job_id . '"><input id="unpaid-button" class="btn btn-warning" type="submit" name="submit_button" value="JOB COMPLETE/UNPAID">';
+                echo $jobcompleteunpaid;
+                ?>
+                </form>
+            </div>
 
-                        <h1><?php echo $house_num . " " . $street_name;?></h1>
-                        <?php echo $latitude . $longitude?>
+            <div class="col-sm">
+                <div class="card-custom">
+                    <div class="card-body" style="border: black">
+                        <h1><?php echo $house_num . " " . $street_name; ?></h1>
                         <table class="table table-hover">
                             <tr>
                                 <th>Clean on:</th>
@@ -260,8 +260,11 @@ ob_end_flush();
                             </tr>
                             <tr>
                                 <th>Last cleaned:</th>
-                                <td><?php echo $dateLastDone ?></td>
-                            </tr>
+                                <td><?php if ($dateLastDone !== null) {
+                                        $dateLastDone = date("d/m/Y", strtotime($dateLastDone));
+                                    } else {
+                                        $dateLastDone = "Not cleaned yet";
+                                    } ?></td>
                             <tr>
                                 <th>Zone:</th>
                                 <td><?php echo $areanameprod ?></td>
@@ -283,19 +286,19 @@ ob_end_flush();
                                 <td><?php echo $info ?></td>
                             </tr>
                         </table>
-                    
-                </div>
-</div>
-</div>
-                <div class="col-sm">
-                    <?php
-                    $jobcompletepaid = '<form action="jobupdate.php" method="get"><input type="hidden" name="id" value="' . $job_id . '"><input class="btn btn-success" type="submit" name="submit_two" value="JOB COMPLETE/PAID"></form>';
-                    echo $jobcompletepaid;
-                    ?>
+
+                    </div>
                 </div>
             </div>
-            <button onClick="location.href = 'jobedit.php?id=<?php echo $job_id ?>'; " class="btn btn-danger" type="button">EDIT JOB</button>
+            <div class="col-sm">
+                <?php
+                $jobcompletepaid = '<form action="jobupdate.php" method="get"><input type="hidden" name="id" value="' . $job_id . '"><input class="btn btn-success" type="submit" name="submit_two" value="JOB COMPLETE/PAID"></form>';
+                echo $jobcompletepaid;
+                ?>
+            </div>
         </div>
+        <button onClick="location.href = 'jobedit.php?id=<?php echo $job_id ?>'; " class="btn btn-danger" type="button">EDIT JOB</button>
+    </div>
 </body>
 <script>
     /* Toggle between showing and hiding the navigation menu links when the user clicks on the hamburger menu / bar icon */
@@ -309,6 +312,6 @@ ob_end_flush();
             document.getElementById("unpaid-button").style.display = "none";
         }
     }
-    </script>
+</script>
 
 </html>
