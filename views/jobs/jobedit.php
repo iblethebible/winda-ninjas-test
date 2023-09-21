@@ -77,49 +77,7 @@ ob_end_flush();
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <link href="/css/main.css" rel="stylesheet">
-    <style>
-        /* Style the navigation menu */
-        .topnav {
-            overflow: hidden;
-            background-color: #333;
-            position: relative;
-        }
 
-        /* Hide the links inside the navigation menu (except for logo/home) */
-        .topnav #myLinks {
-            display: none;
-        }
-
-        /* Style navigation menu links */
-        .topnav a {
-            color: white;
-            padding: 14px 16px;
-            text-decoration: none;
-            font-size: 17px;
-            display: block;
-        }
-
-        /* Style the hamburger menu */
-        .topnav a.icon {
-            background: black;
-            display: block;
-            position: absolute;
-            right: 0;
-            top: 0;
-        }
-
-        /* Add a grey background color on mouse-over */
-        .topnav a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-
-        /* Style the active link (or home/logo) */
-        .active {
-            /* background-color: #04AA6D; */
-            color: white;
-        }
-    </style>
 </head>
 
 <body>
