@@ -14,6 +14,40 @@ $zone_id = $_GET['zone'];
 
 $org_id = $_SESSION['org_id'];
 
+function updateJobAndHistory($conn, $org_id, $job_id, $price, $user, $paymentTypeId, $isPaid) {
+    $stmtFrequency = $conn->prepare("SELECT frequency FROM job_org" . $org_id . " WHERE id = ?");
+    $stmtFrequency->bind_param("i", $job_id);
+    $stmtFrequency->execute();
+    $resultFrequency = $stmtFrequency->get_result();
+    $rowFrequency = $resultFrequency->fetch_assoc();
+    $job_frequency_days = $rowFrequency["frequency"] * 7;
+
+    $stmtUpdateLastDone = $conn->prepare("UPDATE job_org" . $org_id . " SET dateLastDone = NOW() WHERE id = ?");
+    $stmtUpdateLastDone->bind_param("i", $job_id);
+    $stmtUpdateLastDone->execute();
+
+    $stmtUpdateNextDue = $conn->prepare("UPDATE job_org" . $org_id . " SET dateNextDue = DATE_ADD(NOW(), INTERVAL ? DAY) WHERE id = ?");
+    $stmtUpdateNextDue->bind_param("ii", $job_frequency_days, $job_id);
+    $stmtUpdateNextDue->execute();
+
+    $stmtInsertJobHistory = $conn->prepare("INSERT INTO job_history_org" . $org_id . " (job_id, dateDone, paid, price, completed_by, payment_type_id) VALUES (?, NOW(), ?, ?, ?, ?)");
+    $stmtInsertJobHistory->bind_param("iiisi", $job_id, $isPaid, $price, $user, $paymentTypeId);
+    $stmtInsertJobHistory->execute();
+
+    $alertClass = $isPaid ? "alert-success" : "alert-warning";
+    $alertMessage = $isPaid ? "JOB COMPLETED PAID." : "JOB COMPLETED UNPAID.";
+    echo "<div class=\"alert $alertClass\">
+    <strong>Success!</strong> $alertMessage
+    </div>";
+
+    $zone_id = $_SESSION['zone_id'] ?? null;
+    if ($zone_id) {
+        header("Refresh: 1; URL=jobzone.php?zone_id=" . $zone_id);
+    } else {
+        header("Refresh: 1; URL=jobs.php");
+    }
+}
+
 // Get date of last clean from job_history
 $stmtLastClean = $conn->prepare("SELECT * FROM job_history_org" . $org_id . " WHERE job_id = ?");
 $stmtLastClean->bind_param("i", $job_id);
@@ -64,28 +98,9 @@ $rowPaymentType = $resultPaymentType->fetch_assoc();
 $paymentType = $rowPaymentType['paymentType'];
 
 if (isset($_GET['submit_button'])) {
-    // Retrieve job frequency from the database
-    $stmtFrequency = $conn->prepare("SELECT frequency FROM job_org" . $org_id . " WHERE id = ?");
-    $stmtFrequency->bind_param("i", $job_id);
-    $stmtFrequency->execute();
-    $resultFrequency = $stmtFrequency->get_result();
-    $rowFrequency = $resultFrequency->fetch_assoc();
-    $job_frequency = $rowFrequency["frequency"];
-    $job_frequency_days = $job_frequency * 7;
-
-    // Update job status
-    $stmtUpdateLastDone = $conn->prepare("UPDATE job_org" . $org_id . " SET dateLastDone = NOW() WHERE id = ?");
-    $stmtUpdateLastDone->bind_param("i", $job_id);
-    $stmtUpdateLastDone->execute();
-
-    $stmtUpdateNextDue = $conn->prepare("UPDATE job_org" . $org_id . " SET dateNextDue = DATE_ADD(NOW(), INTERVAL ? DAY) WHERE id = ?");
-    $stmtUpdateNextDue->bind_param("ii", $job_frequency_days, $job_id);
-    $stmtUpdateNextDue->execute();
-
-    // Insert job history (unpaid)
-    $stmtInsertJobHistory = $conn->prepare("INSERT INTO job_history_org" . $org_id . " (job_id, dateDone, paid, price, completed_by, payment_type_id) VALUES (?, NOW(), 0, ?, ?, ?)");
-    $stmtInsertJobHistory->bind_param("iisi", $job_id, $price, $user, $rowJobData['paymentType_id']);
-    $stmtInsertJobHistory->execute();
+    // use function
+    updateJobAndHistory($conn, $org_id, $job_id, $price, $user, $rowJobData['paymentType_id'], 0);
+    
 
     echo '<div class="alert alert-warning">
     <strong>Success!</strong> JOB COMPLETED UNPAID.
@@ -102,28 +117,8 @@ if (isset($_GET['submit_button'])) {
 
 
 if (isset($_GET['submit_two'])) {
-    // Retrieve job frequency from the database
-    $stmtFrequency = $conn->prepare("SELECT frequency FROM job_org" . $org_id . " WHERE id = ?");
-    $stmtFrequency->bind_param("i", $job_id);
-    $stmtFrequency->execute();
-    $resultFrequency = $stmtFrequency->get_result();
-    $rowFrequency = $resultFrequency->fetch_assoc();
-    $job_frequency = $rowFrequency["frequency"];
-    $job_frequency_days = $job_frequency * 7;
-
-    // Update job status
-    $stmtUpdateLastDone = $conn->prepare("UPDATE job_org" . $org_id . " SET dateLastDone = NOW() WHERE id = ?");
-    $stmtUpdateLastDone->bind_param("i", $job_id);
-    $stmtUpdateLastDone->execute();
-
-    $stmtUpdateNextDue = $conn->prepare("UPDATE job_org" . $org_id . " SET dateNextDue = DATE_ADD(NOW(), INTERVAL ? DAY) WHERE id = ?");
-    $stmtUpdateNextDue->bind_param("ii", $job_frequency_days, $job_id);
-    $stmtUpdateNextDue->execute();
-
-    // Insert job history (paid)
-    $stmtInsertJobHistory = $conn->prepare("INSERT INTO job_history_org" . $org_id . " (job_id, dateDone, paid, price, completed_by, payment_type_id) VALUES (?, NOW(), 1, ?, ?, ?)");
-    $stmtInsertJobHistory->bind_param("iisi", $job_id, $price, $user, $rowJobData['paymentType_id']);
-    $stmtInsertJobHistory->execute();
+    //use function
+    updateJobAndHistory($conn, $org_id, $job_id, $price, $user, $rowJobData['paymentType_id'], 1);
 
     echo '<div class="alert alert-success">
     <strong>Success!</strong> JOB COMPLETED PAID.
