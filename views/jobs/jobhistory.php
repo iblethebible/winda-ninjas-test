@@ -92,6 +92,7 @@ function getPaymentInfo($jobHistoryId, $org_id, $conn)
                     echo '<th>Price</th>';
                     echo '<th>Paid</th>';
                     echo '<th>Payment Type</th>'; // Add a new column for Payment Type
+                    echo '<th>Create Invoice</th>';
                     echo '</tr>';
 
                     while ($row = $result->fetch_assoc()) {
@@ -101,6 +102,11 @@ function getPaymentInfo($jobHistoryId, $org_id, $conn)
                         echo '<td>' . '£' . $row["price"] . '</td>';
                         echo '<td>' . ($row["paid"] ? 'Yes' : 'No') . '</td>';
                         echo '<td>' . getPaymentInfo($agoodvariable, $org_id, $conn) . '</td>'; // Display the Payment Type
+                        
+                        // Add a button to create an invoice
+                        echo '<td><a href="../invoicing/createInvoice.php?jobHistoryId=' . $agoodvariable . '">Create Invoice</a></td>';
+
+                        
                         if ($row["paid"] == 0) {
                             $jobpaid = '<form action="jobhistory.php" method="get"><input type="hidden" name="id" value="' . $jobtableid . '"><input type="hidden" name="jobHistoryId" value="' . $agoodvariable . '"><input class="btn btn-success" type="submit" name="submit_paid_' . $agoodvariable . '" value="PAID"></form>';
                             echo '<td>' . $jobpaid . '</td>';
