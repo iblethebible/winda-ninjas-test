@@ -70,6 +70,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <link href="/css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- For hamburger menu -->
     <style>
         /* Custom CSS for larger inputs and buttons */
         input[type="number"],
@@ -86,8 +88,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
-    <div class="d-grid gap-3">
-        <button onclick="location.href = '../dashboard.php';" class="btn btn-primary" type="button">Dashboard</button>
+<div class="topnav">
+        <a href="/views/dashboard.php" class="active">Winda Ninjas</a>
+        <!-- Navigation links (hidden by default) -->
+        <div id="myLinks">
+            <a href="/views/jobs/jobs.php">All Jobs</a>
+            <a href="/views/jobs/jobadd.php">Add Job</a>
+            <a href="/views/manager/addzone.php">Add Zone</a>
+            <a href="/views/manager/charts.php">Metrics</a>
+            <a href="/views/manager/changepassword.php">Change Password</a>
+            </a>
+            </a>
+            <a href="/views/manager/logout.php">Logout</a>
+        </div>
+        <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <i class="fa fa-bars"></i>
+        </a>
     </div>
 
     <div class="container">
@@ -133,4 +150,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </body>
+<script>
+function myFunction() {
+    var x = document.getElementById("myLinks");
+    if (x.style.display === "block") { // If the navigation menu is displayed
+        x.style.display = "none"; // Hide the navigation menu
+    } else {
+        x.style.display = "block"; // Display the navigation menu
+    }
+}
+</script>
 </html>

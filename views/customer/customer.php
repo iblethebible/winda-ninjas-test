@@ -60,23 +60,22 @@ $conn->close();
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> <!-- For hamburger menu -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- For hamburger menu -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <script src="jquery-3.6.0.min.js"></script>
     <link href="/css/main.css" rel="stylesheet">
     <style>
-        .card-custom {
-            background-color: #f8f9fa;
-            border-color: #343a40;
-        }
+    .card-custom {
+        background-color: #f8f9fa;
+        border-color: #343a40;
+    }
 
-        .card-custom h1,
-        h2 {
-            color: #343a40;
-        }
-
-
-
+    .card-custom h1,
+    h2 {
+        color: #343a40;
+    }
     </style>
 </head>
 
@@ -109,46 +108,50 @@ $conn->close();
 
                 <!-- Display customer information if available -->
                 <?php if (isset($forename) && isset($surname)) : ?>
-                    <h2 class="mb-3">Customer Information</h2>
-                    <table class="table">
-                        <tr>
-                            <th>Forename:</th>
-                            <td><?php echo $forename ?></td>
-                        </tr>
-                        <tr>
-                            <th>Surname:</th>
-                            <td><?php echo $surname ?></td>
-                        </tr>
-                        <tr>
-                            <th>Email:</th>
-                            <td><?php echo $email ?></td>
-                        </tr>
-                        <tr>
-                            <th>Phone Number:</th>
-                            <td><a href="tel:<?php echo $phoneNumber ?>"><?php echo $phoneNumber ?></a></td>
-                        </tr>
-                    </table>
-                    <button onClick="location.href = 'customeredit.php?id=<?php echo $customerID ?>';" class="btn btn-primary">Edit Customer</button>
+                <h2 class="mb-3">Customer Information</h2>
+                <table class="table">
+                    <tr>
+                        <th>Forename:</th>
+                        <td><?php echo $forename ?></td>
+                    </tr>
+                    <tr>
+                        <th>Surname:</th>
+                        <td><?php echo $surname ?></td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td><a href="mailto:<?php echo $email ?>"><?php echo $email ?></a></td>
+                    </tr>
+                    <tr>
+                        <th>Phone Number:</th>
+                        <td><a href="tel:<?php echo $phoneNumber ?>"><?php echo $phoneNumber ?></a></td>
+                    </tr>
+                </table>
+                <button onClick="location.href = 'customeredit.php?id=<?php echo $customerID ?>';"
+                    class="btn btn-primary">Edit Customer</button>
                 <?php else : ?>
-                    <h2>No Customer Information</h2>
-                    <button onClick="location.href = 'customeradd.php?id=<?php echo $job_id ?>';" class="btn btn-primary">Add Customer</button>
+                <h2>No Customer Information</h2>
+                <button onClick="location.href = 'customeradd.php?id=<?php echo $job_id ?>';"
+                    class="btn btn-primary">Add Customer</button>
                 <?php endif; ?>
                 <h2 class="mt-4"><a href="/views/jobs/jobupdate.php?id=<?php echo $job_id ?>">Return</a></h2>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+    </script>
 
 </body>
 <script>
-    function myFunction() {
-        var x = document.getElementById("myLinks");
-        if (x.style.display === "block") { // If the navigation menu is displayed
-            x.style.display = "none"; // Hide the navigation menu
-        } else {
-            x.style.display = "block"; // Display the navigation menu
-        }
+function myFunction() {
+    var x = document.getElementById("myLinks");
+    if (x.style.display === "block") { // If the navigation menu is displayed
+        x.style.display = "none"; // Hide the navigation menu
+    } else {
+        x.style.display = "block"; // Display the navigation menu
     }
+}
 </script>
 
 </html>
