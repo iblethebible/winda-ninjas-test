@@ -102,9 +102,6 @@ if (isset($_GET['submit_button'])) {
     updateJobAndHistory($conn, $org_id, $job_id, $price, $user, $rowJobData['paymentType_id'], 0);
     
 
-    echo '<div class="alert alert-warning">
-    <strong>Success!</strong> JOB COMPLETED UNPAID.
-</div>';
 
 
     if (isset($_SESSION['zone_id'])) {
@@ -120,9 +117,7 @@ if (isset($_GET['submit_two'])) {
     //use function
     updateJobAndHistory($conn, $org_id, $job_id, $price, $user, $rowJobData['paymentType_id'], 1);
 
-    echo '<div class="alert alert-success">
-    <strong>Success!</strong> JOB COMPLETED PAID.
-</div>';
+
 
 
     if (isset($_SESSION['zone_id'])) {

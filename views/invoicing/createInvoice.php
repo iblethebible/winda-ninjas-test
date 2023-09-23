@@ -15,9 +15,58 @@ require('../../vendor/autoload.php');
 $org_id = $_SESSION['org_id'];
 
 
+$jobHistoryId = $_GET['jobHistoryId'];
+
+// SQL query to retrieve customer and job data
+$query = "SELECT c.*, j.* 
+          FROM job_history_org" . $org_id . " jh
+          JOIN job_org" . $org_id . " j ON jh.job_id = j.id
+          JOIN customer_org" . $org_id . " c ON j.cust_id = c.id
+          WHERE jh.id = ?";
+
+// Prepare the statement
+$stmt = $conn->prepare($query);
+
+if ($stmt === false) {
+    die("Prepare failed: " . $conn->error);
+}
+
+// Bind the job history ID parameter
+$stmt->bind_param("i", $jobHistoryId);
+
+// Execute the query
+$stmt->execute();
+
+// Get the result
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    // Fetch the data into variables
+    $row = $result->fetch_assoc();
+
+    // Store customer data
+    $customerId = $row['id'];
+    $customerForename = $row['forename'];
+    $customerSurname = $row['surname'];
+    $customerEmail = $row['email'];
+    $customerPhoneNumber = $row['phoneNumber'];
+
+    // Store job data
+    $jobId = $row['id'];
+    $jobHouseNumName = $row['houseNumName'];
+    $jobStreetName = $row['streetName'];
+    $jobPrice = $row['price'];
+    $jobPostcode = $row['postcode'];
+    // Add more job data columns as needed
+
+    // Now you have the data in PHP variables for further processing
+} else {
+    echo "No data found for the specified job history ID.";
+}
+
 
 // Fetch organization details
-$orgDetailsSql = "SELECT * FROM organisations WHERE id = ?"; 
+$orgDetailsSql = "SELECT * FROM organisations WHERE id = ?";
 $stmtOrgDetails = $conn->prepare($orgDetailsSql);
 
 if ($stmtOrgDetails === false) {
@@ -40,7 +89,6 @@ $orgEmail = $orgRow["org_email"];
 
 
 
-
 // Initialize PDF
 $pdf = new FPDF('P', 'mm', 'A4'); // Portrait orientation, millimeters units, A4 page size
 $pdf->AddPage();
@@ -49,37 +97,53 @@ $pdf->SetFont('Arial', 'B', 16);
 // Static Elements
 // Adding a logo (logo.png should be in the same directory as this script)
 $pdf->Image('/var/www/html/imgs/logo.png', 10, 10, 30);
-$pdf->Cell(0, 10, $org_name, 0, 1, 'C');
-$pdf->SetFont('Arial', '', 8);
-$pdf->Cell(0, 10, $org_houseNumName, 0, 1, 'C');
-$pdf->Cell(0, 10, $orgStreetName, 0, 1, 'C');
-$pdf->Cell(0, 10, $orgTown, 0, 1, 'C');
-$pdf->Cell(0, 10, $orgCounty, 0, 1, 'C');
-$pdf->Cell(0, 10, $orgPostcode, 0, 1, 'C');
-$pdf->Cell(0, 10, $orgPhone, 0, 1, 'C');
-$pdf->Cell(0, 10, $orgEmail, 0, 1, 'C');
+
+// Organization Details with adjusted spacing
+$pdf->SetFont('Arial', 'B', 12); // Change the font and size
+$pdf->Cell(0, 6, $org_name, 0, 1, 'C'); // Reduce the line height
+$pdf->SetFont('Arial', '', 10); // Change the font and size for address
+$pdf->Cell(0, 6, $org_houseNumName, 0, 1, 'C'); // Reduce the line height
+$pdf->Cell(0, 6, $orgStreetName, 0, 1, 'C'); // Reduce the line height
+$pdf->Cell(0, 6, $orgTown, 0, 1, 'C'); // Reduce the line height
+$pdf->Cell(0, 6, $orgCounty, 0, 1, 'C'); // Reduce the line height
+$pdf->Cell(0, 6, $orgPostcode, 0, 1, 'C'); // Reduce the line height
+$pdf->Cell(0, 6, $orgPhone, 0, 1, 'C'); // Reduce the line height
+$pdf->Cell(0, 6, $orgEmail, 0, 1, 'C'); // Reduce the line height
 
 // Dynamic Elements
 // Assuming the dynamic data comes from some variables like:
-$customerName = "John Doe";
+$customerName = $customerForename . " " . $customerSurname;
+$jobHouseNumName;
+$jobStreetName;
+$jobPostcode;
+$jobPrice;
+
+
 $invoiceNumber = "123456";
 $items = [
-    ['item' => 'Window Cleaning', 'price' => 50],
-    ['item' => 'Gutter Cleaning', 'price' => 25],
+    ['item' => 'Window Cleaning', 'price' => utf8_decode("£") . $jobPrice, 'date' => date('d/m/Y')],
+    
 ];
 
 // Customer details
-$pdf->Cell(0, 10, "Customer: $customerName", 0, 1, 'L');
-$pdf->Cell(0, 10, "Date: " . date('d/m/Y'), 0, 1, 'L');
+$pdf->SetFont('Arial', '', 10); // Change the font and size
+
+$pdf->Cell(0, 6, "Customer:", 0, 1, 'L');
+$pdf->Cell(0, 6, "$customerName", 0, 1, 'L');
+$pdf->Cell(0, 6, "$jobHouseNumName" ,0, 1, 'L');
+$pdf->Cell(0, 6, "$jobStreetName" ,0, 1, 'L');
+$pdf->Cell(0, 6, "$jobPostcode" ,0, 1, 'L');
 $pdf->Cell(0, 10, "Invoice #: $invoiceNumber", 0, 1, 'L');
 
 // Line items and prices
 $pdf->Cell(90, 10, 'Description', 1);
-$pdf->Cell(40, 10, 'Price', 1, 1); // Move to next row
+$pdf->Cell(40, 10, 'Price', 1);
+$pdf->Cell(40, 10, 'Date', 1,1);//move to nextrow of chart
 
 foreach ($items as $item) {
     $pdf->Cell(90, 10, $item['item'], 1);
-    $pdf->Cell(40, 10, $item['price'], 1, 1); // Move to next row
+    $pdf->Cell(40, 10, $item['price'], 1); 
+    $pdf->Cell(40, 10, $item['date'], 1);
 }
 
 // Generate PDF
