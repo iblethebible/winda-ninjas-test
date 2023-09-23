@@ -109,6 +109,7 @@ ob_end_flush();
                     <th scope="col">Address</th>
                     <th scope="col">Price</th>
                     <th scope="col">Paid</th>
+                    <th scope="col">Invoice</th> 
                 </tr>
             </thead>
             <tbody>
@@ -127,6 +128,8 @@ ob_end_flush();
                                 </form>
                             <?php } ?>
                         </td>
+                        <td><a href="../invoicing/createInvoice.php?jobHistoryId=<?php echo $job['history_id']; ?>">Create Invoice</a></td>
+
                     </tr>
                 <?php } ?>
             </tbody>
