@@ -18,11 +18,16 @@ $org_id = $_SESSION['org_id'];
 $jobHistoryId = $_GET['jobHistoryId'];
 
 // SQL query to retrieve customer and job data
-$query = "SELECT c.*, j.* 
+$query = "SELECT 
+            c.id as customerId, c.forename, c.surname, c.email, c.phoneNumber,
+            j.id as jobId, j.houseNumName, j.streetName, j.postcode,
+            jh.price as jobHistoryPrice
           FROM job_history_org" . $org_id . " jh
           JOIN job_org" . $org_id . " j ON jh.job_id = j.id
           JOIN customer_org" . $org_id . " c ON j.cust_id = c.id
           WHERE jh.id = ?";
+
+
 
 // Prepare the statement
 $stmt = $conn->prepare($query);
@@ -45,17 +50,17 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
 
     // Store customer data
-    $customerId = $row['id'];
+    $customerId = $row['customerId'];
     $customerForename = $row['forename'];
     $customerSurname = $row['surname'];
     $customerEmail = $row['email'];
     $customerPhoneNumber = $row['phoneNumber'];
 
     // Store job data
-    $jobId = $row['id'];
+    $jobId = $row['jobId'];
     $jobHouseNumName = $row['houseNumName'];
     $jobStreetName = $row['streetName'];
-    $jobPrice = $row['price'];
+    $jobPrice = $row['jobHistoryPrice'];
     $jobPostcode = $row['postcode'];
     // Add more job data columns as needed
 
@@ -88,6 +93,25 @@ $orgPhone = $orgRow["org_phone"];
 $orgEmail = $orgRow["org_email"];
 
 
+//Insert a new invoice record into the database
+$insertInvoiceSql = "INSERT INTO invoices_org" . $org_id . " (customer_id, job_history_id, invoice_date, price) VALUES (?, ?, ?, ?)";
+$stmtInsertInvoice = $conn->prepare($insertInvoiceSql);
+
+if ($stmtInsertInvoice === false) {
+    die("Prepare failed: " . $conn->error);
+}
+
+// Bind the parameters
+$invoiceDate = date("Y-m-d");
+$stmtInsertInvoice->bind_param("iiss", $customerId, $jobHistoryId, $invoiceDate, $jobPrice);
+
+
+
+// Execute the query
+$stmtInsertInvoice->execute();
+$invoiceId = $conn->insert_id;  // Retrieve the auto-generated ID
+
+
 
 // Initialize PDF
 $pdf = new FPDF('P', 'mm', 'A4'); // Portrait orientation, millimeters units, A4 page size
@@ -118,8 +142,6 @@ $jobStreetName;
 $jobPostcode;
 $jobPrice;
 
-
-$invoiceNumber = "123456";
 $items = [
     ['item' => 'Window Cleaning', 'price' => utf8_decode("£") . $jobPrice, 'date' => date('d/m/Y')],
     
@@ -133,7 +155,7 @@ $pdf->Cell(0, 6, "$customerName", 0, 1, 'L');
 $pdf->Cell(0, 6, "$jobHouseNumName" ,0, 1, 'L');
 $pdf->Cell(0, 6, "$jobStreetName" ,0, 1, 'L');
 $pdf->Cell(0, 6, "$jobPostcode" ,0, 1, 'L');
-$pdf->Cell(0, 10, "Invoice #: $invoiceNumber", 0, 1, 'L');
+$pdf->Cell(0, 10, "Invoice #: $invoiceId", 0, 1, 'L');
 
 // Line items and prices
 $pdf->Cell(90, 10, 'Description', 1);
