@@ -125,6 +125,7 @@ $pdf->Image('/var/www/html/imgs/logo.png', 10, 10, 30);
 // Organization Details with adjusted spacing
 $pdf->SetFont('Arial', 'B', 12); // Change the font and size
 $pdf->Cell(0, 6, $org_name, 0, 1, 'C'); // Reduce the line height
+$pdf->Cell(0, 10, "Invoice #: $invoiceId", 0, 1, 'R');
 $pdf->SetFont('Arial', '', 10); // Change the font and size for address
 $pdf->Cell(0, 6, $org_houseNumName, 0, 1, 'C'); // Reduce the line height
 $pdf->Cell(0, 6, $orgStreetName, 0, 1, 'C'); // Reduce the line height
@@ -155,7 +156,6 @@ $pdf->Cell(0, 6, "$customerName", 0, 1, 'L');
 $pdf->Cell(0, 6, "$jobHouseNumName" ,0, 1, 'L');
 $pdf->Cell(0, 6, "$jobStreetName" ,0, 1, 'L');
 $pdf->Cell(0, 6, "$jobPostcode" ,0, 1, 'L');
-$pdf->Cell(0, 10, "Invoice #: $invoiceId", 0, 1, 'L');
 
 // Line items and prices
 $pdf->Cell(90, 10, 'Description', 1);
