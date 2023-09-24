@@ -78,8 +78,7 @@ $role_id = $_SESSION['role_id'];
                 <a href="/views/manager/addzone.php">Add Zone</a>
                 <a href="/views/manager/charts.php">Metrics</a>
                 <a href="/views/manager/changepassword.php">Change Password</a>
-                </a>
-                </a>
+                <a href="/views/admin/admin_dashboard.php">Admin Dashboard</a>
                 <a href="/views/manager/logout.php">Logout</a>
             </div>
             <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
