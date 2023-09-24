@@ -107,7 +107,7 @@ $checkInvoiceRepeatResult = $stmtCheckInvoiceRepeat->get_result();
 if ($checkInvoiceRepeatResult->num_rows > 0) {
     $row = $checkInvoiceRepeatResult->fetch_assoc();
     if ($row['invoice_created'] == 1) {
-        echo "Invoice already created for this job.";
+        echo "<script>alert('Invoice already created for this job.'); history.go(-1);</script>";        
         exit;
     }
 }
