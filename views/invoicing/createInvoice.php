@@ -92,8 +92,27 @@ $orgPostcode = $orgRow["org_postcode"];
 $orgPhone = $orgRow["org_phone"];
 $orgEmail = $orgRow["org_email"];
 
+// Check if invoice already exists
+$checkInvoiceRepeatSql = "SELECT invoice_created FROM job_history_org" . $org_id . " WHERE id = ?";
+$stmtCheckInvoiceRepeat = $conn->prepare($checkInvoiceRepeatSql);
 
-//Insert a new invoice record into the database
+if ($stmtCheckInvoiceRepeat === false) {
+    die("Prepare failed: " . $conn->error);
+}
+
+$stmtCheckInvoiceRepeat->bind_param("i", $jobHistoryId);
+$stmtCheckInvoiceRepeat->execute();
+$checkInvoiceRepeatResult = $stmtCheckInvoiceRepeat->get_result();
+
+if ($checkInvoiceRepeatResult->num_rows > 0) {
+    $row = $checkInvoiceRepeatResult->fetch_assoc();
+    if ($row['invoice_created'] == 1) {
+        echo "Invoice already created for this job.";
+        exit;
+    }
+}
+
+// Insert a new invoice record into the database
 $insertInvoiceSql = "INSERT INTO invoices_org" . $org_id . " (customer_id, job_history_id, invoice_date, price) VALUES (?, ?, ?, ?)";
 $stmtInsertInvoice = $conn->prepare($insertInvoiceSql);
 
@@ -101,15 +120,34 @@ if ($stmtInsertInvoice === false) {
     die("Prepare failed: " . $conn->error);
 }
 
-// Bind the parameters
+// Bind and execute the insert query
 $invoiceDate = date("Y-m-d");
-$stmtInsertInvoice->bind_param("iiss", $customerId, $jobHistoryId, $invoiceDate, $jobPrice);
+if (!$stmtInsertInvoice->bind_param("iiss", $customerId, $jobHistoryId, $invoiceDate, $jobPrice)) {
+    die("Binding parameters failed: " . $stmtInsertInvoice->error);
+}
 
+if (!$stmtInsertInvoice->execute()) {
+    die("Execute failed: " . $stmtInsertInvoice->error);
+}
 
+$invoiceId = $conn->insert_id;  // Retrieve the auto-generated invoice ID
 
-// Execute the query
-$stmtInsertInvoice->execute();
-$invoiceId = $conn->insert_id;  // Retrieve the auto-generated ID
+// Now, update the 'invoice_created' field for the corresponding job_history_id to 1
+$updateInvoiceCreatedSql = "UPDATE job_history_org" . $org_id . " SET invoice_created = 1 WHERE id = ?";
+$stmtUpdateInvoiceCreated = $conn->prepare($updateInvoiceCreatedSql);
+
+if ($stmtUpdateInvoiceCreated === false) {
+    die("Prepare failed: " . $conn->error);
+}
+
+if (!$stmtUpdateInvoiceCreated->bind_param("i", $jobHistoryId)) {
+    die("Binding parameters failed: " . $stmtUpdateInvoiceCreated->error);
+}
+
+if (!$stmtUpdateInvoiceCreated->execute()) {
+    die("Execute failed: " . $stmtUpdateInvoiceCreated->error);
+}
+
 
 
 
