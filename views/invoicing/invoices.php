@@ -15,6 +15,8 @@ $org_id = $_SESSION['org_id'];
 
 // Query to fetch invoices, customer names, and job addresses
 $query = "SELECT i.invoice_id AS invoice_id, i.invoice_date, 
+          jh.id AS job_history_id,  
+          c.id AS customer_id,  
           CONCAT(c.forename, ' ', c.surname) AS customer_name,
           CONCAT(j.houseNumName, ', ', j.streetName, ', ', j.postcode) AS job_address
           FROM invoices_org" . $org_id . " i
@@ -34,7 +36,8 @@ if ($result->num_rows > 0) {
         echo "<td>" . $row['invoice_date'] . "</td>";
         echo "<td>" . $row['customer_name'] . "</td>";
         echo "<td>" . $row['job_address'] . "</td>";
-        echo "<td><a href='view_invoice.php?invoice_id=" . $row['invoice_id'] . "'>View</a></td>";
+        // Pass both invoice_id and job_history_id as query parameters
+        echo "<td><a href='viewInvoice.php?invoiceId=" . $row['invoice_id'] . "&jobHistoryId=" . $row['job_history_id'] . "&customerId=" . $row['customer_id'] . "'>View</a></td>";
         echo "</tr>";
     }
     echo "</table>";
@@ -43,4 +46,3 @@ if ($result->num_rows > 0) {
 }
 
 $conn->close();
-?>

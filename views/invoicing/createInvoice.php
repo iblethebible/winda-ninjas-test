@@ -122,7 +122,7 @@ if ($stmtInsertInvoice === false) {
 
 // Bind and execute the insert query
 $invoiceDate = date("Y-m-d");
-if (!$stmtInsertInvoice->bind_param("iiss", $customerId, $jobHistoryId, $invoiceDate, $jobPrice)) {
+if (!$stmtInsertInvoice->bind_param("iisi", $customerId, $jobHistoryId, $invoiceDate, $jobPrice)) {
     die("Binding parameters failed: " . $stmtInsertInvoice->error);
 }
 
