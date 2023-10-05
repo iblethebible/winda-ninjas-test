@@ -13,11 +13,27 @@ form {
     margin-bottom: 5px;
 }
 
+@media (min-width: 992px) {
+    #chartCarousel {
+      display: none;
+    }
+  }
+
 .card-custom {
     background-color: #f8f9fa; 
     border-color: #343a40;
     border-style: 45px;
 }
+
+.card-same-height {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-same-height .card-body {
+    flex: 1 1 auto;
+}
+
 
 table {
     margin-top: 10px;

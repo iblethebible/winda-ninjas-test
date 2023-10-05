@@ -8,6 +8,7 @@ if (!isset($_SESSION['loggedin'])) {
   header('location: /index.html');
   exit;
 }
+
 include "../../includes/connectdb.php";
 date_default_timezone_set('GMT');
 $user = $_SESSION['name'];
@@ -92,6 +93,12 @@ if ($stmt = $conn->prepare($sql2)) {
         border-radius: 5px;
         background-color: #e1eded;
     }
+
+    @media (min-width: 992px) {
+        #chartCarousel {
+            display: none;
+        }
+    }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -117,9 +124,13 @@ if ($stmt = $conn->prepare($sql2)) {
             </a>
         </div>
         <div class="container mt-5">
-    <h1>Admin Dashboard</h1>
-    <div class="row">
-        <?php
+            <h1>Admin Dashboard</h1>
+            <div class="row">
+                <div id="chartCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <?php
+        $isActive = "active"; // The first item should be active
+            foreach ($timescales as $timescale => $data) {
         $timescales = [
             'daily' => [
                 'label' => 'Daily',
@@ -200,88 +211,106 @@ if ($stmt = $conn->prepare($sql2)) {
             $totalWorkData = array_values($totalWork);
             $earningsData = array_values($earnings);
         ?>
+                        <div class="carousel-item <?php echo $isActive; ?>">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><?php echo $data['label']; ?> £ Worked/Collected</h5>
+                                        <canvas id="workChart<?php echo ucfirst($timescale); ?>"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php 
+                $isActive = ""; // Only the first item should be active, so we reset this for subsequent items
+            }
+            ?>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#chartCarousel"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#chartCarousel"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
 
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo $data['label']; ?> £ Worked/Collected</h5>
-                        <canvas id="workChart<?php echo ucfirst($timescale); ?>"></canvas>
-                    </div>
-                </div>
-            </div>
 
-
-            <script>
-                const ctx<?php echo ucfirst($timescale); ?> = document.getElementById('workChart<?php echo ucfirst($timescale); ?>').getContext('2d');
-                new Chart(ctx<?php echo ucfirst($timescale); ?>, {
-                    type: 'bar',
-                    data: {
-                        labels: <?php echo json_encode($labels); ?>,
-                        datasets: [{
-                                label: 'Total Work',
-                                data: <?php echo json_encode($totalWorkData); ?>,
-                                backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                                borderColor: 'rgba(0, 123, 255, 1)',
-                                borderWidth: 1
+                        <script>
+                        const ctx<?php echo ucfirst($timescale); ?> = document.getElementById(
+                            'workChart<?php echo ucfirst($timescale); ?>').getContext('2d');
+                        new Chart(ctx<?php echo ucfirst($timescale); ?>, {
+                            type: 'bar',
+                            data: {
+                                labels: <?php echo json_encode($labels); ?>,
+                                datasets: [{
+                                        label: 'Total Work',
+                                        data: <?php echo json_encode($totalWorkData); ?>,
+                                        backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                                        borderColor: 'rgba(0, 123, 255, 1)',
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: 'Collected',
+                                        data: <?php echo json_encode($earningsData); ?>,
+                                        backgroundColor: 'rgba(220, 53, 69, 0.5)',
+                                        borderColor: 'rgba(220, 53, 69, 1)',
+                                        borderWidth: 1
+                                    }
+                                ]
                             },
-                            {
-                                label: 'Collected',
-                                data: <?php echo json_encode($earningsData); ?>,
-                                backgroundColor: 'rgba(220, 53, 69, 0.5)',
-                                borderColor: 'rgba(220, 53, 69, 1)',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            },
-                            x: {
-                                barPercentage: 1,
-                                categoryPercentage: 0.5
-                            }
-                        },
-                        plugins: {
-                            tooltip: {
-                                enabled: true,
-                                displayColors: false,
-                                callbacks: {
-                                    label: function(context) {
-                                        var label = context.dataset.label || '';
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    },
+                                    x: {
+                                        barPercentage: 1,
+                                        categoryPercentage: 0.5
+                                    }
+                                },
+                                plugins: {
+                                    tooltip: {
+                                        enabled: true,
+                                        displayColors: false,
+                                        callbacks: {
+                                            label: function(context) {
+                                                var label = context.dataset.label || '';
 
-                                        if (label) {
-                                            label += ': ';
+                                                if (label) {
+                                                    label += ': ';
+                                                }
+                                                if (context.parsed.y !== null) {
+                                                    label += new Intl.NumberFormat('en-US', {
+                                                        style: 'currency',
+                                                        currency: 'GBP'
+                                                    }).format(context.parsed.y);
+                                                }
+                                                return label;
+                                            }
                                         }
-                                        if (context.parsed.y !== null) {
-                                            label += new Intl.NumberFormat('en-US', {
-                                                style: 'currency',
-                                                currency: 'GBP'
-                                            }).format(context.parsed.y);
-                                        }
-                                        return label;
                                     }
                                 }
                             }
-                        }
-                    }
-                });
-            </script>
-        <?php } ?>
-        <script>
-            /* Toggle between showing and hiding the navigation menu links when the user clicks on the hamburger menu / bar icon */
-            function myFunction() {
-                var x = document.getElementById("myLinks");
-                if (x.style.display === "block") {
-                    x.style.display = "none";
+                        });
+                        </script>
+                        <script>
+                        /* Toggle between showing and hiding the navigation menu links when the user clicks on the hamburger menu / bar icon */
+                        function myFunction() {
+                            var x = document.getElementById("myLinks");
+                            if (x.style.display === "block") {
+                                x.style.display = "none";
 
-                } else {
-                    x.style.display = "block";
-                }
-            }
-        </script>
-    </div>
+                            } else {
+                                x.style.display = "block";
+                            }
+                        }
+                        </script>
+                    </div>
+                    <!-- Bootstrap JS (Optional) -->
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js">
+                    </script>
 
 </body>
 
