@@ -13,12 +13,17 @@ $user = $_SESSION['name'];
 // Fetching bank details if they exist
 $sql = "SELECT bank_beneficiary, bank_sortCode, bank_accountNumber FROM organisations WHERE id = $org_id";
 $result = $conn->query($sql);
+$beneficiary = "";
+$sort_code = "";
+$account_number = "";
+$bankDetailsAvailable = false;
+
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
-
     $beneficiary = $row['bank_beneficiary'];
     $sort_code = $row['bank_sortCode'];
     $account_number = $row['bank_accountNumber'];
+    $bankDetailsAvailable = true;  // Add this line
 } else {
     $beneficiary = "No bank details";
     $sort_code = "No bank details";
@@ -76,11 +81,11 @@ $conn->close();
 
 
                 <!-- Display job information -->
-                <h1 class="mb-4"><?php echo "Bank Details"?></h1>
-
+                <h1 class="mb-4">Bank Details</h1>
+                
                 <table class="table">
                     <tr>
-                        <th>beneficiary:</th>
+                        <th>Beneficiary:</th>
                         <td><?php echo $beneficiary ?></td>
                     </tr>
                     <tr>
@@ -92,13 +97,11 @@ $conn->close();
                         <td><?php echo $account_number?></td>
                     </tr>
                 </table>
-                <!-- <button onClick="location.href = 'customeredit.php?id=<?php echo $customerID ?>';"
-                    class="btn btn-primary">Edit Customer</button>
-                <h2>No Customer Information</h2>
-                <button onClick="location.href = 'customeradd.php?id=<?php echo $job_id ?>';"
-                    class="btn btn-primary">Add Customer</button> -->
-
-                <h2 class="mt-4"><a href="/views/jobs/jobupdate.php?id=<?php echo $job_id ?>">Return</a></h2>
+                
+                <button onClick="location.href = 'bank_details_edit.php?id=<?php echo $org_id ?>';"
+                    class="btn btn-primary">Edit/Add bank details</button>
+                
+                <h2 class="mt-4"><a href="/views/admin/admin_dashboard.php">Return</a></h2>
             </div>
         </div>
     </div>
