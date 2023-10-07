@@ -49,7 +49,6 @@ ob_end_flush();
         <div id="myLinks">
             <a href="/views/jobs/jobs.php">All Jobs</a>
             <a href="/views/jobs/jobadd.php">Add Job</a>
-            <a href="/views/manager/addzone.php">Add Zone</a>
             <a href="/views/manager/charts.php">Metrics</a>
             <a href="/views/manager/changepassword.php">Change Password</a>
             </a>
@@ -63,7 +62,7 @@ ob_end_flush();
     </div>
     <div class="container mt-5">
 
-
+        <h1>Add Zone</h1>
         <div class="card card-custom">
 
             <div class="card-body">
@@ -80,6 +79,11 @@ ob_end_flush();
 
 
 
+    </div>
+    <div class="card-custom">
+        <div class="card-body">
+            
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>

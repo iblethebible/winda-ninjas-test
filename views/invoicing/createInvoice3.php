@@ -91,9 +91,6 @@ $orgCounty = $orgRow["org_county"];
 $orgPostcode = $orgRow["org_postcode"];
 $orgPhone = $orgRow["org_phone"];
 $orgEmail = $orgRow["org_email"];
-$orgBeneficiary = $orgRow["bank_beneficiary"];
-$orgAccountNumber = $orgRow["bank_accountNumber"];
-$orgSortCode = $orgRow["bank_sortCode"];
 
 // Check if invoice already exists
 $checkInvoiceRepeatSql = "SELECT invoice_created FROM job_history_org" . $org_id . " WHERE id = ?";
@@ -213,9 +210,9 @@ foreach ($items as $item) {
 $pdf->Cell(0, 10, '', 0, 1);
 $pdf->SetFont('Arial', 'B', 12); // Change the font to Arial, bold, size 12
 $pdf->Cell(0, 10, 'Bank Details', 0, 1); // Title
-$pdf->Cell(0, 6, 'Account Name:' . $orgBeneficiary, 0, 1); 
-$pdf->Cell(0, 6, 'Sort Code:' . $orgSortCode, 0, 1);
-$pdf->Cell(0, 6, 'Account Number:' . $orgAccountNumber, 0, 1);
+$pdf->Cell(0, 6, 'Account Name: HCM CLEANING', 0, 1); 
+$pdf->Cell(0, 6, 'Sort Code: 04-00-03', 0, 1);
+$pdf->Cell(0, 6, 'Account Number: 17256145', 0, 1);
 // Generate PDF
 $pdf->Output()
 ?>
