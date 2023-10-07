@@ -49,9 +49,11 @@ function getPaymentInfo($jobHistoryId, $org_id, $conn)
     <meta charset="utf-8">
     <script type="text/javascript" src="/js/removeCompleteButtons.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
     <script src="jquery-3.6.0.min.js"></script>
     <link href="/css/main.css" rel="stylesheet">
     <style>
@@ -82,9 +84,6 @@ function getPaymentInfo($jobHistoryId, $org_id, $conn)
             <a href="/views/jobs/jobadd.php">Add Job</a>
             <a href="/views/manager/addzone.php">Add Zone</a>
             <a href="/views/manager/charts.php">Metrics</a>
-            <a href="/views/manager/changepassword.php">Change Password</a>
-            </a>
-            </a>
             <a href="/views/manager/logout.php">Logout</a>
         </div>
         <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
@@ -135,7 +134,8 @@ function getPaymentInfo($jobHistoryId, $org_id, $conn)
                         echo '<td>' . getPaymentInfo($agoodvariable, $org_id, $conn) . '</td>'; // Display the Payment Type
 
                         // Add a button to create an invoice
-                        echo '<td><a href="../invoicing/createInvoice.php?jobHistoryId=' . $agoodvariable . '">Create Invoice</a></td>';
+                        echo '<td><a href="../invoicing/createInvoice.php?jobHistoryId=' . $agoodvariable . '"><i class="fa fa-file-invoice" aria-hidden="true"></i></a></td>';
+
                         echo '</tr>';
                     }
                     echo '</table>';
