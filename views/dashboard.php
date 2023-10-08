@@ -75,9 +75,7 @@ $role_id = $_SESSION['role_id'];
             <div id="myLinks">
                 <a href="/views/jobs/jobs.php">All Jobs</a>
                 <a href="/views/jobs/jobadd.php">Add Job</a>
-                <a href="/views/manager/addzone.php">Add Zone</a>
                 <a href="/views/manager/charts.php">Metrics</a>
-                <a href="/views/manager/changepassword.php">Change Password</a>
                 <a href="/views/admin/admin_dashboard.php">Admin Dashboard</a>
                 <a href="/views/manager/logout.php">Logout</a>
             </div>
