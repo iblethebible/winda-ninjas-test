@@ -1,12 +1,8 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 if (!isset($_SESSION['loggedin'])) {
-  header('location: /index.html');
-  exit;
+    header('location: /index.html');
+    exit;
 }
 include "../../includes/connectdb.php";
 date_default_timezone_set('GMT');
@@ -15,64 +11,35 @@ $org_id = $_SESSION['org_id'];
 $zone_id = $_SESSION['zone_id'];
 $role_id = $_SESSION['role_id'];
 
-$org_id = $_SESSION['org_id'];
-
 $job_table_name = "job_org" . $org_id;
 
-// Original SQL query
-$sql = "SELECT zone_org{$org_id}.area AS zone, paymentType.paymentType AS paymentType, COUNT(*) AS count
-        FROM job_org{$org_id}
-        JOIN zone_org{$org_id} ON job_org{$org_id}.zone_id = zone_org{$org_id}.id
-        JOIN paymentType ON job_org{$org_id}.paymentType_id = paymentType.id
-        GROUP BY zone_org{$org_id}.area, paymentType.paymentType;";
+// Define getCount function
+function getCount($conn, $sql)
+{
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
+    return $row['total'];
+}
 
-$result = $conn->query($sql);
+$sql = "SELECT COUNT(*) AS total FROM $job_table_name";
+$total_jobs = getCount($conn, $sql);
 
-$data = array();
-while ($row = $result->fetch_assoc()) {
-    $zone = $row['zone'];
-    $paymentType = $row['paymentType'];
-    $count = $row['count'];
+$sql = "SELECT COUNT(*) AS total FROM users WHERE org_id = $org_id AND role_id = 2";
+$total_workers = getCount($conn, $sql);
 
-    if (!isset($data[$zone])) {
-        $data[$zone] = array();
-    }
-    $data[$zone][$paymentType] = $count;
+// Fetching monthly values for jobs
+$monthly_values = [];
+for ($i = 1; $i <= 12; $i++) {
+    $sql = "SELECT SUM(price) AS total FROM job_history_org" . $org_id . " WHERE MONTH(dateDone) = $i AND YEAR(dateDone) = YEAR(CURDATE())";
+    $monthly_values[$i] = getCount($conn, $sql);
 }
 
 
-// sql for average monthly valu
-$sql2 = "SELECT 
-            zone_org{$org_id}.id as 'Zone', 
-            zone_org{$org_id}.area as 'Area',
-            SUM(job_org{$org_id}.price / job_org{$org_id}.frequency * 4) as 'avg_monthly_value'
-         FROM 
-            job_org{$org_id}
-         JOIN 
-            zone_org{$org_id}
-         ON 
-            job_org{$org_id}.zone_id = zone_org{$org_id}.id 
-         GROUP BY 
-            zone_org{$org_id}.id, zone_org{$org_id}.area";
 
-if ($stmt = $conn->prepare($sql2)) {
-  $stmt->execute();
-  $result2 = $stmt->get_result();
 
-  $data2 = array(); // Initialize to empty array
-  while ($row = $result2->fetch_assoc()) {
-      $zone = $row['Area'];
-      $avg_monthly_value = $row['avg_monthly_value'];
-      $data2[$zone] = $avg_monthly_value;
-  }
-  $stmt->close();
-} else {
-  echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
-}
 
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -87,11 +54,11 @@ if ($stmt = $conn->prepare($sql2)) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- For hamburger menu -->
     <style>
-    .cards {
-        border: 2px solid #007bff;
-        border-radius: 5px;
-        background-color: #e1eded;
-    }
+        .cards {
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            background-color: #e1eded;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -117,172 +84,95 @@ if ($stmt = $conn->prepare($sql2)) {
             </a>
         </div>
         <div class="container mt-5">
-    <h1>Admin Dashboard</h1>
-    <div class="row">
-        <?php
-        $timescales = [
-            'daily' => [
-                'label' => 'Daily',
-                'interval' => '-5 days',
-                'dateInterval' => 'P1D',
-                'format' => 'D, d M'
-            ],
-            'weekly' => [
-                'label' => 'Weekly',
-                'interval' => '-5 weeks',
-                'dateInterval' => 'P7D',
-                'format' => 'W'
-            ],
-            'monthly' => [
-                'label' => 'Monthly',
-                'interval' => '-5 months',
-                'dateInterval' => 'P1M',
-                'format' => 'M'
-            ]
-        ];
+            <h1>Admin Dashboard</h1>
+            <div class="row">
+                <!-- HTML canvas element -->
+                <canvas id="lineChartValue" width="400" height="200"></canvas>
 
-        foreach ($timescales as $timescale => $data) {
-            $interval = $data['interval'];
-            $format = $data['format'];
-
-            $startDate = date('Y-m-d', strtotime($interval));
-            $endDate = date('Y-m-d');
-
-            $period = new DatePeriod(
-                new DateTime($startDate),
-                new DateInterval($data['dateInterval']),
-                new DateTime($endDate)
-            );
-
-            $sqlTotalWork = "SELECT price, dateDone
-                             FROM job_history_org" . $org_id . "
-                             WHERE dateDone BETWEEN ? AND ?
-                             ORDER BY dateDone ASC";
-
-            $sqlEarnings = "SELECT price, dateDone
-                            FROM job_history_org" . $org_id . "
-                            WHERE paid = 1 AND dateDone BETWEEN ? AND ?
-                            ORDER BY dateDone ASC";
-
-            $stmtTotalWork = $conn->prepare($sqlTotalWork);
-            $stmtTotalWork->bind_param("ss", $startDate, $endDate);
-            $stmtTotalWork->execute();
-            $resultTotalWork = $stmtTotalWork->get_result();
-
-            $stmtEarnings = $conn->prepare($sqlEarnings);
-            $stmtEarnings->bind_param("ss", $startDate, $endDate);
-            $stmtEarnings->execute();
-            $resultEarnings = $stmtEarnings->get_result();
-
-            $totalWork = [];
-            $earnings = [];
-
-            // Initialize all days with 0
-            foreach ($period as $date) {
-                $key = $date->format($format);
-                $totalWork[$key] = 0;
-                $earnings[$key] = 0;
-            }
-
-            while ($row = $resultTotalWork->fetch_assoc()) {
-                $date = new DateTime($row['dateDone']);
-                $key = $date->format($format);
-                $totalWork[$key] += $row['price'];
-            }
-
-            while ($row = $resultEarnings->fetch_assoc()) {
-                $date = new DateTime($row['dateDone']);
-                $key = $date->format($format);
-                $earnings[$key] += $row['price'];
-            }
-
-            $labels = array_keys($totalWork);
-            $totalWorkData = array_values($totalWork);
-            $earningsData = array_values($earnings);
-        ?>
-
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo $data['label']; ?> £ Worked/Collected</h5>
-                        <canvas id="workChart<?php echo ucfirst($timescale); ?>"></canvas>
-                    </div>
-                </div>
-            </div>
-
-
-            <script>
-                const ctx<?php echo ucfirst($timescale); ?> = document.getElementById('workChart<?php echo ucfirst($timescale); ?>').getContext('2d');
-                new Chart(ctx<?php echo ucfirst($timescale); ?>, {
-                    type: 'bar',
-                    data: {
-                        labels: <?php echo json_encode($labels); ?>,
-                        datasets: [{
-                                label: 'Total Work',
-                                data: <?php echo json_encode($totalWorkData); ?>,
-                                backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                                borderColor: 'rgba(0, 123, 255, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Collected',
-                                data: <?php echo json_encode($earningsData); ?>,
-                                backgroundColor: 'rgba(220, 53, 69, 0.5)',
-                                borderColor: 'rgba(220, 53, 69, 1)',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            },
-                            x: {
-                                barPercentage: 1,
-                                categoryPercentage: 0.5
-                            }
+                <!-- JavaScript for Chart.js -->
+                <script>
+                    var ctxValue = document.getElementById('lineChartValue').getContext('2d');
+                    var monthly_values = <?php echo json_encode(array_values($monthly_values)); ?>;
+                    var myLineChartValue = new Chart(ctxValue, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                            datasets: [{
+                                label: 'Income per Month (£)',
+                                data: monthly_values,
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(0, 0, 0, 0)'
+                            }]
                         },
-                        plugins: {
-                            tooltip: {
-                                enabled: true,
-                                displayColors: false,
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value, index, values) {
+                                            return '£' + value;
+                                        }
+                                    }
+                                }
+                            },
+                            tooltips: {
                                 callbacks: {
-                                    label: function(context) {
-                                        var label = context.dataset.label || '';
-
+                                    label: function(tooltipItem, data) {
+                                        var label = data.datasets[tooltipItem.datasetIndex].label || '';
                                         if (label) {
-                                            label += ': ';
+                                            label += ': £';
                                         }
-                                        if (context.parsed.y !== null) {
-                                            label += new Intl.NumberFormat('en-US', {
-                                                style: 'currency',
-                                                currency: 'GBP'
-                                            }).format(context.parsed.y);
-                                        }
+                                        label += Math.round(tooltipItem.yLabel * 100) / 100;
                                         return label;
                                     }
                                 }
                             }
                         }
+                    });
+                </script>
+
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-sm-6">
+                    <div class="card mb-4">
+                        <div class="card-body cards">
+                            <h5 class="card-title"><b>Total Jobs</b></h5>
+                            <p class="card-text"><?php echo $total_jobs; ?></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="card mb-4">
+                        <div class="card-body cards">
+                            <h5 class="card-title"><b>Workers</b></h5>
+                            <p class="card-text"><?php echo $total_workers; ?></p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <script src="https://unpkg.com/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"></script>
+
+            <script>
+                /* Toggle between showing and hiding the navigation menu links when the user clicks on the hamburger menu / bar icon */
+                function myFunction() {
+                    var x = document.getElementById("myLinks");
+                    if (x.style.display === "block") {
+                        x.style.display = "none";
+                    } else {
+                        x.style.display = "block";
                     }
-                });
-            </script>
-        <?php } ?>
-        <script>
-            /* Toggle between showing and hiding the navigation menu links when the user clicks on the hamburger menu / bar icon */
-            function myFunction() {
-                var x = document.getElementById("myLinks");
-                if (x.style.display === "block") {
-                    x.style.display = "none";
-
-                } else {
-                    x.style.display = "block";
                 }
-            }
-        </script>
-    </div>
-
+            </script>
+            <?php include '../../includes/footer.php'; ?>
+    </container>
 </body>
+<!-- At the end of your body tag -->
+
+
 
 </html>

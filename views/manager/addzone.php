@@ -9,6 +9,10 @@ if (!isset($_SESSION['loggedin'])) {
 include "../../includes/connectdb.php";
 $org_id = $_SESSION['org_id'];
 
+// SQL query to fetch all zones related to org_id
+$sql = "SELECT * FROM zone_org" . $org_id;
+$result = $conn->query($sql);
+
 if (isset($_POST["add_zone_submit"])) {
     $zone_name = $_POST["zone_name"];
 
@@ -79,10 +83,29 @@ ob_end_flush();
 
 
 
-    </div>
-    <div class="card-custom">
-        <div class="card-body">
-            
+
+        <div class="card card-custom">
+            <div class="card-body">
+                <h2>Current Zones</h2>
+                <?php
+                // Check if the query returned any rows
+                if ($result->num_rows > 0) {
+                    echo '<table class="table table-bordered table-striped">';    
+                    echo '<tbody>';
+                    // Fetch and display each zone
+                    while ($row = $result->fetch_assoc()) {
+                        echo '<tr>';
+                        echo '<td>' . $row['area'] . '</td>';
+                        echo '</tr>';
+                    }
+                    echo '</tbody>';
+                    echo '</table>';
+                } else {
+                    echo '<p>No zones available</p>';
+                }
+                ?>
+            </div>
+
         </div>
     </div>
 

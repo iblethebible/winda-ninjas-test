@@ -9,6 +9,7 @@ date_default_timezone_set('GMT');
 $user = $_SESSION['name'];
 $org_id = $_SESSION['org_id'];
 $zone_id = $_SESSION['zone_id'];
+$role_id = $_SESSION['role_id'];
 
 
 if (!isset($_SESSION['zone_id'])) {
@@ -21,8 +22,7 @@ if (!isset($_SESSION['zone_id'])) {
         // Assign the zone ID to the session variable
         $_SESSION['zone_id'] = $row['id'];
     } else {
-        echo "No records found in the zone table.";
-        exit;
+        echo "You must be new here. Please add a zone in the admin dashboard and also change your password so i can't see your data! This is done by navigating to the top right menu selecting ADMIN DASHBOARD then using the new options available in the dropdown menu.";
     }
 }
 
@@ -74,9 +74,12 @@ $role_id = $_SESSION['role_id'];
             <!-- Navigation links (hidden by default) -->
             <div id="myLinks">
                 <a href="/views/jobs/jobs.php">All Jobs</a>
+                <?php if($role_id == 1): ?>
                 <a href="/views/jobs/jobadd.php">Add Job</a>
                 <a href="/views/manager/charts.php">Metrics</a>
+
                 <a href="/views/admin/admin_dashboard.php">Admin Dashboard</a>
+                <?php endif; ?> 
                 <a href="/views/manager/logout.php">Logout</a>
             </div>
             <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
@@ -161,6 +164,8 @@ $role_id = $_SESSION['role_id'];
                 }).addTo(previewMap);
             </script>
         </div>
+        <?php if($role_id == 1): ?>
+
         <div class="row">
             <div class="col-md-6">
                 <a href="manager/collect.php" style="text-decoration: none; color: inherit;">
@@ -199,8 +204,10 @@ $role_id = $_SESSION['role_id'];
                         </div>
                     </div>
                 </a>
+            
             </div>
         </div>
+        <?php endif; ?>
         </div>
 
         <script src="https://unpkg.com/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -234,3 +241,4 @@ $role_id = $_SESSION['role_id'];
 
 
 </html>
+

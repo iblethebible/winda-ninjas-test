@@ -13,8 +13,10 @@ $org_id = $_SESSION['org_id'];
 
 
 $job_id = $_GET['id'];
-// Fetch the job location (latitude and longitude) from the database
 
+
+
+// Fetch the job location (latitude and longitude) from the database
 // Prepare an SQL statement for execution
 $stmt = $conn->prepare("SELECT latitude, longitude, houseNumName, streetName FROM job_org" . $org_id . " WHERE id = ?");
 
@@ -107,6 +109,7 @@ $stmt->close();
                 <div id="map" style="height: 400px;" data-aws-region="<?php echo getenv('AWS_REGION'); ?>" data-aws-access-key-id="<?php echo getenv('AWS_ACCESS_KEY_ID'); ?>" data-aws-secret-access-key="<?php echo getenv('AWS_SECRET_ACCESS_KEY'); ?>"></div>
             </div>
         </div>
+        <h2><a href="../jobs/jobupdate.php?id=<?php echo $job_id ?>">Return</a></h2>
 
         <!-- Include Leaflet JS file -->
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

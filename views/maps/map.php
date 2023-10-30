@@ -10,6 +10,7 @@ if (!isset($_SESSION['loggedin'])) {
 include "../../includes/connectdb.php";
 date_default_timezone_set('GMT');
 $org_id = $_SESSION['org_id'];
+$role_id = $_SESSION['role_id']; 
 
 $jobType = $_POST['jobType'] ?? 'due'; // Default to 'due'
 
@@ -73,12 +74,11 @@ ob_end_flush();
         <!-- Navigation links (hidden by default) -->
         <div id="myLinks">
             <a href="/views/jobs/jobs.php">All Jobs</a>
+            <?php if($role_id == 1): ?>
             <a href="/views/jobs/jobadd.php">Add Job</a>
             <a href="/views/manager/addzone.php">Add Zone</a>
-            <a href="/views/manager/charts.php">Metrics</a>
-            <a href="/views/manager/changepassword.php">Change Password</a>
-            </a>
-            </a>
+            <a href="/views/manager/charts.php">Metrics</a
+            <?php endif; ?>
             <a href="/views/manager/logout.php">Logout</a>
         </div>
         <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->

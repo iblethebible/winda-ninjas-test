@@ -64,13 +64,6 @@ if (isset($_POST["change_password_submit"])) {
 ob_end_flush();
 ?>
 
-<!-- The rest of your HTML code for the change password page goes here -->
-
-
-<!-- The rest of your HTML code for the change password page goes here -->
-
-
-
 <!DOCTYPE html>
 <html>
 
@@ -97,9 +90,6 @@ ob_end_flush();
             <a href="/views/jobs/jobadd.php">Add Job</a>
             <a href="/views/manager/addzone.php">Add Zone</a>
             <a href="/views/manager/charts.php">Metrics</a>
-            <a href="/views/manager/changepassword.php">Change Password</a>
-            </a>
-            </a>
             <a href="/views/manager/logout.php">Logout</a>
         </div>
         <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->

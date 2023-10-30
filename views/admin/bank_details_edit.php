@@ -3,7 +3,7 @@ ob_start();
 
 session_start();
 if (!isset($_SESSION['loggedin'])) {
-    header('location: /index.html');
+    header('location: /index.php');
     exit;
 }
 
