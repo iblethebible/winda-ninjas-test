@@ -53,7 +53,6 @@ if ($resultTotalUnpaid->num_rows > 0) {
             margin-bottom: 20px;
             /* Space beneath the box */
         }
-              
     </style>
     <title>Unpaid Jobs</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -129,7 +128,8 @@ if ($resultTotalUnpaid->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             echo '<tr style="height:90px">';
             echo '<td>' . $row["houseNumName"] . '<br> ' . $row["streetName"] . '</td>';
-            echo '<td>' . $row["dateDone"] . '</td>';
+            $dateDone = new DateTime($row["dateDone"]);
+            echo '<td>' . $dateDone->format('d/m/Y') . '</td>'; // Formats the date to DD/MM/YYYY
             echo '<td>£' . $row["price"] . '</td>';
             echo '<td>' . $row["paymentType"] . '</td>';
             echo '<td><a href="collect.php?pay_job_id=' . $row["id"] . '" class="btn btn-success">Mark as Paid</a></td>';

@@ -48,13 +48,6 @@ function updateJobAndHistory($conn, $org_id, $job_id, $price, $user, $paymentTyp
     }
 }
 
-// Get date of last clean from job_history
-$stmtLastClean = $conn->prepare("SELECT * FROM job_history_org" . $org_id . " WHERE job_id = ?");
-$stmtLastClean->bind_param("i", $job_id);
-$stmtLastClean->execute();
-$resultLastClean = $stmtLastClean->get_result();
-$rowLastClean = $resultLastClean->fetch_assoc();
-$dateLastDone = $rowLastClean["dateDone"];
 
 // Get job details
 $stmtJobData = $conn->prepare("SELECT * FROM job_org" . $org_id . " WHERE id = ?");
@@ -209,10 +202,6 @@ ob_end_flush();
                             <tr>
                                 <th>Clean on:</th>
                                 <td><?php echo $dateNextDue ?></td>
-                            </tr>
-
-                            <th>Last cleaned:</th>
-                            <td><?php echo $dateLastDone?></td>
                             </tr>
 
                             <tr>

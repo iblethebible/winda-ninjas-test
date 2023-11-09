@@ -74,8 +74,6 @@ $stmt->close();
             border-color: #343a40;
             border: 2px solid #007bff;
         }
-
-
     </style>
 
 </head>
@@ -100,7 +98,7 @@ $stmt->close();
                 <i class="fa fa-bars"></i>
             </a>
         </div>
-        <h1>Directions<br> <?php echo $job_houseNumName . " " . $job_streetName?></h1>
+        <h1>Directions<br> <?php echo $job_houseNumName . " " . $job_streetName ?></h1>
         <!-- Create a container for the map and pass AWS credentials as data attributes -->
 
         <div class="card card-custom">
@@ -226,17 +224,35 @@ $stmt->close();
                     calculateRoute(departure, destination);
                 });
             }
+            // Function to periodically update the route
+            function updateRoute() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        var lat = position.coords.latitude;
+                        var lon = position.coords.longitude;
+                        var departure = [lat, lon];
+                        var destination = [job_latitude, job_longitude];
+                        calculateRoute(departure, destination);
+                    });
+                }
+            }
+
+            // Initialize route calculation
+            updateRoute();
+
+            // Update the route every 15 seconds
+            setInterval(updateRoute, 15000);
         </script>
-<script>
-  function myFunction() {
-    var x = document.getElementById("myLinks");
-    if (x.style.display === "block") {
-      x.style.display = "none";
-    } else {
-      x.style.display = "block";
-    }
-  }
-</script>
+        <script>
+            function myFunction() {
+                var x = document.getElementById("myLinks");
+                if (x.style.display === "block") {
+                    x.style.display = "none";
+                } else {
+                    x.style.display = "block";
+                }
+            }
+        </script>
 
 </body>
 

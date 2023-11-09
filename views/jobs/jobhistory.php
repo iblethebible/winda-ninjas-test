@@ -50,33 +50,32 @@ function getPaymentInfo($jobHistoryId, $org_id, $conn)
     <script type="text/javascript" src="/js/removeCompleteButtons.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <script src="jquery-3.6.0.min.js"></script>
     <link href="/css/main.css" rel="stylesheet">
     <style>
-    tr:nth-child(even) {
-        background-color: #D6EEEE;
-    }
+        tr:nth-child(even) {
+            background-color: #D6EEEE;
+        }
 
-    .card-custom {
-        background-color: #f8f9fa;
-        border-color: #343a40;
-    }
+        .card-custom {
+            background-color: #f8f9fa;
+            border-color: #343a40;
+        }
 
-    .card-custom h1,
-    h2 {
-        color: #343a40;
-    }
+        .card-custom h1,
+        h2 {
+            color: #343a40;
+        }
     </style>
     <title>Winda Ninjas</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 
 <body>
-<div class="topnav">
+    <div class="topnav">
         <a href="/views/dashboard.php" class="active">Winda Ninjas</a>
         <!-- Navigation links (hidden by default) -->
         <div id="myLinks">
@@ -117,7 +116,9 @@ function getPaymentInfo($jobHistoryId, $org_id, $conn)
                     while ($row = $result->fetch_assoc()) {
                         $agoodvariable = $row["id"];
                         echo '<tr>';
-                        echo '<td>' . $row["dateDone"] . '</td>';
+                        // Format the dateDone to English format (DD/MM/YYYY)
+                        $dateDone = new DateTime($row["dateDone"]);
+                        echo '<td>' . $dateDone->format('d/m/Y') . '</td>'; // Outputs the date in DD/MM/YYYY format
                         echo '<td>' . '£' . $row["price"] . '</td>';
                         echo '<td>';
 
@@ -184,19 +185,19 @@ function getPaymentInfo($jobHistoryId, $org_id, $conn)
     $conn->close();
     ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
     </script>
 
 </body>
 <script>
-function myFunction() {
-    var x = document.getElementById("myLinks");
-    if (x.style.display === "block") { // If the navigation menu is displayed
-        x.style.display = "none"; // Hide the navigation menu
-    } else {
-        x.style.display = "block"; // Display the navigation menu
+    function myFunction() {
+        var x = document.getElementById("myLinks");
+        if (x.style.display === "block") { // If the navigation menu is displayed
+            x.style.display = "none"; // Hide the navigation menu
+        } else {
+            x.style.display = "block"; // Display the navigation menu
+        }
     }
-}
 </script>
+
 </html>
