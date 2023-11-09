@@ -74,11 +74,6 @@ ob_end_flush();
         <!-- Navigation links (hidden by default) -->
         <div id="myLinks">
             <a href="/views/jobs/jobs.php">All Jobs</a>
-            <?php if($role_id == 1): ?>
-            <a href="/views/jobs/jobadd.php">Add Job</a>
-            <a href="/views/manager/addzone.php">Add Zone</a>
-            <a href="/views/manager/charts.php">Metrics</a
-            <?php endif; ?>
             <a href="/views/manager/logout.php">Logout</a>
         </div>
         <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->

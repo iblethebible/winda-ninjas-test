@@ -104,12 +104,6 @@ ob_end_flush();
         <!-- Navigation links (hidden by default) -->
         <div id="myLinks">
             <a href="/views/jobs/jobs.php">All Jobs</a>
-            <a href="/views/jobs/jobadd.php">Add Job</a>
-            <a href="/views/manager/addzone.php">Add Zone</a>
-            <a href="/views/manager/charts.php">Metrics</a>
-            <a href="/views/manager/changepassword.php">Change Password</a>
-            </a>
-            </a>
             <a href="/views/manager/logout.php">Logout</a>
         </div>
         <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
