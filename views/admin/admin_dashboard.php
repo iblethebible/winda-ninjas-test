@@ -72,6 +72,7 @@ for ($i = 1; $i <= 12; $i++) {
             <div id="myLinks">
                 <a href="/views/jobs/jobs.php">All Jobs</a>
                 <a href="/views/jobs/jobadd.php">Add Job</a>
+                <a href="/views/manager/dieselcalc.php">Diesel Calculator</a>
                 <a href="bank_details.php">Bank Details</a>
                 <a href="/views/manager/addzone.php">Zones</a>
                 <a href="/views/manager/charts.php">Metrics</a>

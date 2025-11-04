@@ -37,7 +37,7 @@ if ($result->num_rows > 0) {
         echo "<td>" . $row['customer_name'] . "</td>";
         echo "<td>" . $row['job_address'] . "</td>";
         // Pass both invoice_id and job_history_id as query parameters
-        echo "<td><a href='viewInvoice.php?invoiceId=" . $row['invoice_id'] . "&jobHistoryId=" . $row['job_history_id'] . "&customerId=" . $row['customer_id'] . "'>View</a></td>";
+        echo "<td><a href='viewInvoice.php?invoiceId=" . $row['invoice_id'] . "&jobHistoryId=" . $row['job_history_id'] . "&customerId=" . $row['customer_id'] . "&invoiceId=" . $row['invoice_id'] . "'>View</a></td>";
         echo "</tr>";
     }
     echo "</table>";

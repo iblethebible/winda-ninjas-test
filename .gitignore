@@ -7,3 +7,8 @@
 /startup-script.sh
 /vendor
 views/jobs/jobupdate_OLD.php
+/connectdb.php
+/directory_structure.txt
+/docker-compose.yml
+/Dockerfile
+

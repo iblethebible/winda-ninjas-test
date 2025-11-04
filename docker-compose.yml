@@ -1,42 +1,79 @@
 version: "3.9"
+
 services:
   db:
-    image: mysql:latest
-    volumes:
-      - /media/usb/mysql:/var/lib/mysql
+    image: mysql:8.0
+    container_name: ubuntu_db_1
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: Bighead4548
       MYSQL_DATABASE: windaninjasdb
       MYSQL_USER: admin
       MYSQL_PASSWORD: Bighead4548
-    networks:
-      - backend
+    volumes:
+      - /media/usb/mysql:/var/lib/mysql
+    # safer: don't expose to WAN; bind to localhost only if you need host access
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
+    networks: [backend]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-pBighead4548"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
   web:
     build:
       context: /media/usb/php-apache
       dockerfile: Dockerfile
+    container_name: ubuntu_web_1
     depends_on:
       - db
-
-    volumes:
-      - /media/usb/php-apache:/var/www/html
-      - /home/ubuntu/certificates:/etc/apache2/ssl
-      - /media/usb/apache/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf
+    restart: always
     ports:
       - "80:80"
       - "443:443"
-    restart: always
-    networks:
-      - frontend
-      - backend
+    volumes:
+      # your site code
+      - /media/usb/php-apache:/var/www/html
+      # mount LE certs from the HOST (read-only)
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /media/usb/apache/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf
+      - /media/usb/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
+      - /media/usb/apache/servername.conf:/etc/apache2/conf-available/servername.conf
+      - /media/usb/apache/init.sh:/docker-init/init.sh
+    command: ["/bin/bash","-lc","/docker-init/init.sh"]
+
     environment:
       AWS_REGION: eu-west-2
       AWS_ACCESS_KEY_ID: AKIA3YC5GZJVUL5I2SQO
       AWS_SECRET_ACCESS_KEY: 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
+      DB_HOST: db
+      DB_USER: admin
+      DB_PASS: Bighead4548
+      DB_NAME: windaninjasdb
+    networks: [frontend, backend]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    restart: always
+    # write renewed certs to host; use webroot challenge through your site's docroot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /media/usb/php-apache:/var/www/html
+    entrypoint: >
+      /bin/sh -c 'trap exit TERM;
+      while :; do
+        certbot renew --quiet --webroot -w /var/www/html || true;
+        sleep 12h;
+      done'
+    networks: [frontend]
 
 networks:
   frontend:

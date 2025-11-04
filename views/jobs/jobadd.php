@@ -12,14 +12,14 @@ if (!isset($_SESSION['loggedin'])) {
 include "../../includes/connectdb.php";
 require '/var/www/html/vendor/autoload.php';
 
-use Aws\LocationService\LocationServiceClient;
+// use Aws\LocationService\LocationServiceClient;
 
-$locationClient = new LocationServiceClient([
-    'region'  => 'eu-west-2',
-    'version' => 'latest',
-    'key' => getenv('AWS_ACCESS_KEY_ID'),
-    'secret' => getenv('AWS_SECRET_ACCESS_KEY'),
-]);
+// $locationClient = new LocationServiceClient([
+//     'region'  => 'eu-west-2',
+//     'version' => 'latest',
+//     'key' => getenv('AWS_ACCESS_KEY_ID'),
+//     'secret' => getenv('AWS_SECRET_ACCESS_KEY'),
+// ]);
 date_default_timezone_set('GMT');
 $org_id = $_SESSION['org_id'];
 
@@ -46,37 +46,41 @@ if (isset($_GET["job_add_submit"])) {
     $stmt->fetch();
     $stmt->close();
 
-    // Sending the address information to geocoder.php
-    $address = $var_house_num . ', ' . $var_street . ', ' . $zone_name . ' , ' . $var_postcode;
-    echo "Address: " . $address;
-    $geocodeURL = "https://windaninjas.ddns.net/views/maps/geocoder.php?address=" . urlencode($address);
-    $geocodeResult = file_get_contents($geocodeURL);
-    $geocodeData = json_decode($geocodeResult, true);
+//     // Sending the address information to geocoder.php
+// // Sending the address information to geocoder.php
+// $address = $var_house_num . ', ' . $var_street . ', ' . $zone_name . ' , ' . $var_postcode;
+// echo "Address: " . $address;
+// $geocodeURL = "https://windaninjas.ddns.net/views/maps/geocoder.php?address=" . urlencode($address);
+// $geocodeResult = file_get_contents($geocodeURL);
+// $geocodeData = json_decode($geocodeResult, true);
 
-    if ($geocodeData && $geocodeData['status'] === 'OK') {
-        $latitude = $geocodeData['latitude'];
-        $longitude = $geocodeData['longitude'];
+// // Initialize default values for latitude and longitude
+// $latitude = 0;
+// $longitude = 0;
 
-        $stmtAddJob = $conn->prepare("INSERT INTO job_org" . $org_id . " (houseNumName, streetName, postcode, price, frequency, zone_id, paymentType_id, info, longitude, latitude,  dateNextDue) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+// // Update latitude and longitude if geocoding is successful
+// if ($geocodeData && $geocodeData['status'] === 'OK') {
+//     $latitude = $geocodeData['latitude'] ?? $latitude;
+//     $longitude = $geocodeData['longitude'] ?? $longitude;
+// }
 
-        if (!$stmtAddJob) {
-            die("Prepare failed: (" . $conn->error . ") " . $conn->error);
-        }
+// // Proceed to add the job with either geocoded or default coordinates
+// $stmtAddJob = $conn->prepare("INSERT INTO job_org" . $org_id . " (houseNumName, streetName, postcode, price, frequency, zone_id, paymentType_id, info, longitude, latitude, dateNextDue) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        $stmtAddJob->bind_param("ssssisssdss", $var_house_num, $var_street, $var_postcode, $var_price, $var_frequency, $var_zone, $var_payment, $var_info, $longitude, $latitude, $dateNextDue);
+// if (!$stmtAddJob) {
+//     die("Prepare failed: (" . $conn->error . ") " . $conn->error);
+// }
 
-        if ($stmtAddJob->execute()) {
-            echo '<div class="alert alert-success">
-                <strong>Success!</strong> Job record added.
-            </div>';
-            header('Refresh: 1; URL=jobadd.php');  //*************<<<<<CHANGE THIS BACK TO jobadd.php *********************************
-        } else {
-            echo "Error: " . $conn->error;
-        }
-    } else {
-        // Handle geocoding error here
-        echo "Error: Geocoding failed.";
-    }
+$stmtAddJob->bind_param("ssssissss", $var_house_num, $var_street, $var_postcode, $var_price, $var_frequency, $var_zone, $var_payment, $var_info, $dateNextDue);
+
+if ($stmtAddJob->execute()) {
+    echo '<div class="alert alert-success">
+        <strong>Success!</strong> Job record added.
+    </div>';
+    header('Refresh: 1; URL=jobadd.php');
+} else {
+    echo "Error: " . $conn->error;
+}
 }
 
 ob_end_flush();

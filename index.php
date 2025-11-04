@@ -77,7 +77,7 @@ if(isset($_SESSION['error'])) {
                 </form>
             </div>
         </div>
-        <footer class="text-center mt-3">Harry Morris 2023</footer>
+        <footer class="text-center mt-3">Harry Morris 2025</footer>
     </div>
 </body>
 
