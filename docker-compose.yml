@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: Bighead4548
       MYSQL_DATABASE: windaninjasdb
       MYSQL_USER: admin
-      MYSQL_PASSWORD: Bighead4548
+      MYSQL_PASSWORD:
     volumes:
       - /media/usb/mysql:/var/lib/mysql
     # safer: don't expose to WAN; bind to localhost only if you need host access
